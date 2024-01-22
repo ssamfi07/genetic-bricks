@@ -1,0 +1,63 @@
+Type	Item No	Item Name	Qty	Color ID	Extra?	Alternate?	Match ID	Counterpart?	
+
+P	85940	Technic, Liftarm, Modified Bar 1 x 2	2	11	N	N	0	N	
+P	93606	Slope, Curved 4 x 2	1	5	N	N	0	N	
+P	6005	Arch 1 x 3 x 2 Curved Top	2	5	N	N	0	N	
+P	67810	Slope, Curved 2 x 2 x 1 1/3 Corner Round with Recessed Stud	2	5	N	N	0	N	
+P	15068	Slope, Curved 2 x 2 x 2/3	1	5	N	N	0	N	
+P	70681	Arch 1 x 3 Inverted	4	5	N	N	0	N	
+P	88292	Arch 1 x 3 x 2	2	5	N	N	0	N	
+P	32803	Slope, Curved 2 x 2 x 2/3 Inverted	1	11	N	N	0	N	
+P	47753	Wedge 4 x 4 Triple Curved No Studs	2	5	N	N	0	N	
+P	64225	Wedge 4 x 3 Triple Curved No Studs	1	11	N	N	0	N	
+P	4070	Brick, Modified 1 x 1 with Headlight	4	5	N	N	0	N	
+P	30414	Brick, Modified 1 x 4 with Studs on Side	1	5	N	N	0	N	
+P	73109	Technic, Brick Modified 1 x 2 with Hole and 1 x 2 Plate	1	5	N	N	0	N	
+P	32064	Technic, Brick 1 x 2 with Axle Hole	3	5	N	N	0	N	
+P	3700	Technic, Brick 1 x 2 with Hole	1	11	N	N	0	N	
+P	6232	Brick, Modified 2 x 2 with Pin and Axle Hole	1	5	N	N	0	N	
+P	13548	Wedge 2 x 2 (Slope 45 Corner)	4	5	N	N	0	N	
+P	92946	Slope 45 2 x 1 with 2/3 Cutout	2	5	N	N	0	N	
+P	3747b	Slope, Inverted 33 3 x 2 with Flat Bottom Pin and Connections between Studs	1	86	N	N	0	N	
+P	11090	Bar Holder with Clip	2	5	N	N	0	N	
+P	32073	Technic, Axle  5L	1	3	N	N	0	N	
+P	3673	Technic, Pin without Friction Ridges	2	86	N	N	0	N	
+P	77765	Technic, Pin 3L without Friction Ridges with Stop	1	86	N	N	0	N	
+P	3022	Plate 2 x 2	3	1	N	N	0	N	
+P	3021	Plate 2 x 3	3	5	N	N	0	N	
+P	3710	Plate 1 x 4	1	5	N	N	0	N	
+P	3795	Plate 2 x 6	2	5	N	N	0	N	
+P	15573	Plate, Modified 1 x 2 with 1 Stud with Groove and Bottom Stud Holder (Jumper)	3	5	N	N	0	N	
+P	3666	Plate 1 x 6	3	5	N	N	0	N	
+P	3069b	Tile 1 x 2 with Groove	2	5	N	N	0	N	
+P	3068b	Tile 2 x 2 with Groove	2	5	N	N	0	N	
+P	26603	Tile 2 x 3	2	5	N	N	0	N	
+P	78329	Plate 1 x 5	2	11	N	N	0	N	
+P	3024	Plate 1 x 1	1	17	N	N	0	N	
+P	3623	Plate 1 x 3	2	85	N	N	0	N	
+P	18649	Plate, Modified 1 x 2 with Bar Handles on Ends	1	5	N	N	0	N	
+P	48336	Plate, Modified 1 x 2 with Bar Handle on Side - Closed Ends	1	5	N	N	0	N	
+P	44861	Plate, Modified 1 x 2 with Open O Clip on Top	2	5	N	N	0	N	
+P	63868	Plate, Modified 1 x 2 with Clip on End (Horizontal Grip)	2	5	N	N	0	N	
+P	93274	Bracket 1 x 2 - 2 x 4	2	11	N	N	0	N	
+P	99207	Bracket 1 x 2 - 2 x 2 Inverted	2	11	N	N	0	N	
+P	61252	Plate, Modified 1 x 1 with Open O Clip (Horizontal Grip)	2	11	N	N	0	N	
+P	32828	Bar   1L with 1 x 1 Round Plate with Hollow Stud	4	86	N	N	0	N	
+P	15712	Tile, Modified 1 x 1 with Open O Clip	1	86	N	N	0	N	
+P	3738	Technic, Plate 2 x 8 with 7 Holes	1	85	N	N	0	N	
+P	18980	Plate, Round Corner 2 x 6 Double	1	5	N	N	0	N	
+P	26601	Wedge, Plate 2 x 2  Cut Corner	2	5	N	N	0	N	
+P	27925	Tile, Round Corner 2 x 2 Macaroni	2	5	N	N	0	N	
+P	35480	Plate, Round 1 x 2 with Open Studs	5	5	N	N	0	N	
+P	25269	Tile, Round 1 x 1 Quarter	6	5	N	N	0	N	
+P	41770	Wedge, Plate 4 x 2 Left	1	5	N	N	0	N	
+P	4032	Plate, Round 2 x 2 with Axle Hole	2	5	N	N	0	N	
+P	41769	Wedge, Plate 4 x 2 Right	1	5	N	N	0	N	
+P	85861	Plate, Round 1 x 1 with Open Stud	2	11	N	N	0	N	
+P	4740	Dish 2 x 2 Inverted (Radar)	1	12	N	N	0	N	
+P	18674	Tile, Round 2 x 2 with Open Stud	1	85	N	N	0	N	
+P	78258	Bar 2L with Stop Ring	2	11	N	N	0	N	
+P	58090	Tire 30.4 x 14 Solid	2	11	N	N	0	N	
+P	55981	Wheel 18mm D. x 14mm with Pin Hole, Fake Bolts and Shallow Spokes	2	86	N	N	0	N	
+P	77598	Vehicle, Base 2 x 2 x 2/3 Wheel Fork with 2 Arms and Pin Holes	1	85	N	N	0	N	
+P	40517stk01	Sticker Sheet for Set 40517 - (93596/6381826)	1	0	N	N	0	N	

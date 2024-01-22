@@ -1,0 +1,165 @@
+Type	Item No	Item Name	Qty	Color ID	Extra?	Alternate?	Match ID	Counterpart?	
+
+P	2357	Brick 2 x 2 Corner	2	11	N	N	0	N	
+P	3010	Brick 1 x 4	7	11	N	N	0	N	
+P	3001	Brick 2 x 4	4	11	N	N	0	N	
+P	2877	Brick, Modified 1 x 2 with Grille / Fluted Profile	5	11	N	N	0	N	
+P	30414	Brick, Modified 1 x 4 with Studs on Side	2	11	N	N	0	N	
+P	3700	Technic, Brick 1 x 2 with Hole	2	11	N	N	0	N	
+P	3894	Technic, Brick 1 x 6 with Holes	1	11	N	N	0	N	
+P	54200	Slope 30 1 x 1 x 2/3	8	11	N	N	0	N	
+P	85984	Slope 30 1 x 2 x 2/3	4	11	N	N	0	N	
+P	4287	Slope, Inverted 33 3 x 1	2	11	N	N	0	N	
+P	3038	Slope 45 2 x 3	2	11	N	N	0	N	
+P	3299	Slope 33 2 x 4 Double	2	11	N	N	0	N	
+P	61409	Slope 18 2 x 1 x 2/3 with Grille	14	11	N	N	0	N	
+P	87617	Cylinder 1 x 5 1/2 with Bar Handle (Friction Cylinder)	4	11	N	N	0	N	
+P	43857	Technic, Liftarm Thick 1 x 2	2	11	N	N	0	N	
+P	60484	Technic, Liftarm, Modified T-Shape Thick 3 x 3	4	11	N	N	0	N	
+P	45590	Technic, Axle Connector Double - Flexible Rubber	2	11	N	N	0	N	
+P	53585	Technic Ball Joint with Through Axle Hole	4	11	N	N	0	N	
+P	2780	Technic, Pin with Short Friction Ridges	4	11	N	N	0	N	
+P	6091	Slope, Curved 2 x 1 x 1 1/3 with Recessed Stud	4	11	N	N	0	N	
+P	3022	Plate 2 x 2	6	11	N	N	0	N	
+P	3623	Plate 1 x 3	2	11	N	N	0	N	
+P	3021	Plate 2 x 3	6	11	N	N	0	N	
+P	3710	Plate 1 x 4	13	11	N	N	0	N	
+P	3020	Plate 2 x 4	20	11	N	N	0	N	
+P	3460	Plate 1 x 8	2	11	N	N	0	N	
+P	3958	Plate 6 x 6	1	11	N	N	0	N	
+P	3832	Plate 2 x 10	2	11	N	N	0	N	
+P	60479	Plate 1 x 12	3	11	N	N	0	N	
+P	2445	Plate 2 x 12	2	11	N	N	0	N	
+P	2412b	Tile, Modified 1 x 2 Grille with Bottom Groove / Lip	14	11	N	N	0	N	
+P	44728	Bracket 1 x 2 - 2 x 2	2	11	N	N	0	N	
+P	93274	Bracket 1 x 2 - 2 x 4	2	11	N	N	0	N	
+P	48336	Plate, Modified 1 x 2 with Bar Handle on Side - Closed Ends	8	11	N	N	0	N	
+P	3068b	Tile 2 x 2 with Groove	4	11	N	N	0	N	
+P	63864	Tile 1 x 3	24	11	N	N	0	N	
+P	2431	Tile 1 x 4	2	11	N	N	0	N	
+P	87079	Tile 2 x 4	12	11	N	N	0	N	
+P	2429c01	Hinge Plate 1 x 4 Swivel (2429 / 2430)	1	11	N	N	0	N	
+P	4162	Tile 1 x 8	8	11	N	N	0	N	
+P	43723	Wedge, Plate 3 x 2 Left	4	11	N	N	0	N	
+P	43722	Wedge, Plate 3 x 2 Right	4	11	N	N	0	N	
+P	2654	Plate, Round 2 x 2 with Rounded Bottom (Boat Stud)	1	11	N	N	0	N	
+P	54384	Wedge, Plate 6 x 3 Left	4	11	N	N	0	N	
+P	54383	Wedge, Plate 6 x 3 Right	4	11	N	N	0	N	
+P	2450	Wedge, Plate 3 x 3 Cut Corner	24	11	N	N	0	N	
+P	43719	Wedge, Plate 4 x 4	2	11	N	N	0	N	
+P	4079b	Minifigure, Utensil Seat / Chair 2 x 2 with Center Sprue Mark	1	11	N	N	0	N	
+P	4592c02	Antenna Small Base with Black Lever (4592 / 4593)	4	11	N	N	0	N	
+P	58247	Minifigure, Weapon Gun, Blaster SW Standard	2	11	N	N	0	N	
+P	30088	Minifigure, Weapon Spear Gun with Rounded Trigger and Thin Spear Base	2	11	N	N	0	N	
+P	6538c	Technic, Axle Connector 2L (Smooth with x Hole + Orientation)	2	11	N	N	0	N	
+P	6232	Brick, Modified 2 x 2 with Pin and Axle Hole	1	5	N	N	0	N	
+P	32054	Technic, Pin 3L with Friction Ridges and Stop Bush	2	5	N	N	0	N	
+P	3003	Brick 2 x 2	2	85	N	N	0	N	
+P	2456	Brick 2 x 6	1	85	N	N	0	N	
+P	4589b	Cone 1 x 1 with Top Groove	6	85	N	N	0	N	
+P	3701	Technic, Brick 1 x 4 with Holes	2	85	N	N	0	N	
+P	3747b	Slope, Inverted 33 3 x 2 with Flat Bottom Pin and Connections between Studs	2	85	N	N	0	N	
+P	60477	Slope 18 4 x 1	6	85	N	N	0	N	
+P	52501	Slope, Inverted 45 6 x 1 Double with 1 x 4 Cutout	1	85	N	N	0	N	
+P	50950	Slope, Curved 3 x 1	2	85	N	N	0	N	
+P	3023	Plate 1 x 2	9	85	N	N	0	N	
+P	3623	Plate 1 x 3	4	85	N	N	0	N	
+P	3021	Plate 2 x 3	4	85	N	N	0	N	
+P	3795	Plate 2 x 6	12	85	N	N	0	N	
+P	3034	Plate 2 x 8	2	85	N	N	0	N	
+P	3070b	Tile 1 x 1 with Groove	3	85	N	N	0	N	
+P	2555	Tile, Modified 1 x 1 with Clip	2	85	N	N	0	N	
+P	2412b	Tile, Modified 1 x 2 Grille with Bottom Groove / Lip	6	85	N	N	0	N	
+P	3069b	Tile 1 x 2 with Groove	11	85	N	N	0	N	
+P	4085d	Plate, Modified 1 x 1 with Open O Clip Thick (Vertical Grip)	2	85	N	N	0	N	
+P	2540	Plate, Modified 1 x 2 with Bar Handle on Side - Free Ends	1	85	N	N	0	N	
+P	47998	Plate, Modified 4 x 4 with 2 Clips (Horizontal Grip)	4	85	N	N	0	N	
+P	44570	Hinge Plate 3 x 4 Locking Dual 2 Fingers, 9 Teeth	3	85	N	N	0	N	
+P	2654	Plate, Round 2 x 2 with Rounded Bottom (Boat Stud)	4	85	N	N	0	N	
+P	51739	Wedge, Plate 2 x 4	3	85	N	N	0	N	
+P	48183	Wedge, Plate 3 x 4 with Stud Notches	2	85	N	N	0	N	
+P	2419	Wedge, Plate 3 x 6 Cut Corners	4	85	N	N	0	N	
+P	4865b	Panel 1 x 2 x 1 with Rounded Corners	2	85	N	N	0	N	
+P	32524	Technic, Liftarm Thick 1 x 7	6	85	N	N	0	N	
+P	87083	Technic, Axle  4L with Stop	2	85	N	N	0	N	
+P	3004	Brick 1 x 2	4	85	N	N	0	N	
+P	3031	Plate 4 x 4	4	85	N	N	0	N	
+P	2639	Plate 4 x 4 Corner	4	85	N	N	0	N	
+P	30355	Wedge, Plate 12 x 6 Left	2	85	N	N	0	N	
+P	30356	Wedge, Plate 12 x 6 Right	2	85	N	N	0	N	
+P	4162	Tile 1 x 8	2	1	N	N	0	N	
+P	3022	Plate 2 x 2	1	2	N	N	0	N	
+P	3749	Technic, Axle  1L with Pin without Friction Ridges	8	2	N	N	0	N	
+P	43093	Technic, Axle  1L with Pin with Friction Ridges	16	7	N	N	0	N	
+P	4274	Technic, Pin 1/2 without Friction Ridges	8	7	N	N	0	N	
+P	6558	Technic, Pin 3L with Friction Ridges	18	7	N	N	0	N	
+P	4070	Brick, Modified 1 x 1 with Headlight	2	86	N	N	0	N	
+P	32064	Technic, Brick 1 x 2 with Axle Hole	10	86	N	N	0	N	
+P	2653	Brick, Modified 1 x 4 with Groove	2	86	N	N	0	N	
+P	3023	Plate 1 x 2	10	86	N	N	0	N	
+P	2420	Plate 2 x 2 Corner	4	86	N	N	0	N	
+P	3022	Plate 2 x 2	5	86	N	N	0	N	
+P	3623	Plate 1 x 3	4	86	N	N	0	N	
+P	3021	Plate 2 x 3	8	86	N	N	0	N	
+P	3710	Plate 1 x 4	8	86	N	N	0	N	
+P	3700	Technic, Brick 1 x 2 with Hole	1	86	N	N	0	N	
+P	32000	Technic, Brick 1 x 2 with Holes	2	86	N	N	0	N	
+P	2730	Technic, Brick 1 x 10 with Holes	4	86	N	N	0	N	
+P	32324	Technic, Brick 4 x 4 Open Center	2	86	N	N	0	N	
+P	3665	Slope, Inverted 45 2 x 1	4	86	N	N	0	N	
+P	85984	Slope 30 1 x 2 x 2/3	10	86	N	N	0	N	
+P	3039	Slope 45 2 x 2	2	86	N	N	0	N	
+P	3046a	Slope 45 2 x 2 Double Concave	2	86	N	N	0	N	
+P	4286	Slope 33 3 x 1	4	86	N	N	0	N	
+P	3298	Slope 33 3 x 2	2	86	N	N	0	N	
+P	30363	Slope 18 4 x 2	2	86	N	N	0	N	
+P	60219	Slope, Inverted 45 6 x 4 Double with 4 x 4 Cutout and 3 Holes	3	86	N	N	0	N	
+P	43710	Wedge 4 x 2 Triple Left	1	86	N	N	0	N	
+P	43711	Wedge 4 x 2 Triple Right	1	86	N	N	0	N	
+P	3007	Brick 2 x 8	1	86	N	N	0	N	
+P	3666	Plate 1 x 6	15	86	N	N	0	N	
+P	3713	Technic Bush	2	86	N	N	0	N	
+P	32015	Technic, Axle and Pin Connector Angled #5 - 112.5 degrees	2	86	N	N	0	N	
+P	4519	Technic, Axle  3L	6	86	N	N	0	N	
+P	3069bps1	Tile 1 x 2 with Groove with SW Computer Pattern	1	86	N	N	0	N	
+P	3069b	Tile 1 x 2 with Groove	2	86	N	N	0	N	
+P	99781	Bracket 1 x 2 - 1 x 2	6	86	N	N	0	N	
+P	99207	Bracket 1 x 2 - 2 x 2 Inverted	2	86	N	N	0	N	
+P	32028	Plate, Modified 1 x 2 with Door Rail	17	86	N	N	0	N	
+P	2476	Plate, Modified 2 x 2 with Pin on Bottom	4	86	N	N	0	N	
+P	92582	Hinge Plate 2 x 2 Locking with 1 Finger on Top	4	86	N	N	0	N	
+P	2444	Plate, Modified 2 x 2 with Pin Hole	16	86	N	N	0	N	
+P	2436	Bracket 1 x 2 - 1 x 4	2	86	N	N	1	N	
+P	3729	Plate, Modified 2 x 2 with Tow Ball	2	86	N	N	0	N	
+P	44568	Hinge Plate 1 x 4 Locking Dual 1 Finger on Side	2	86	N	N	0	N	
+P	41862	Plate, Modified 2 x 2 with Vents	2	86	N	N	0	N	
+P	2335	Flag 2 x 2 Square	1	86	N	N	0	N	
+P	4510	Plate, Modified 1 x 8 with Door Rail	2	86	N	N	0	N	
+P	4073	Plate, Round 1 x 1	2	86	N	N	0	N	
+P	54384	Wedge, Plate 6 x 3 Left	6	86	N	N	0	N	
+P	54383	Wedge, Plate 6 x 3 Right	6	86	N	N	0	N	
+P	2450	Wedge, Plate 3 x 3 Cut Corner	12	86	N	N	0	N	
+P	30503	Wedge, Plate 4 x 4 Cut Corner	4	86	N	N	0	N	
+P	87618	Bar   5L with Handle (Friction Ram)	4	86	N	N	0	N	
+P	55981	Wheel 18mm D. x 14mm with Pin Hole, Fake Bolts and Shallow Spokes	2	86	N	N	0	N	
+P	61184	Technic, Pin 1/2 with 2L Bar Extension (Flick Missile)	8	86	N	N	0	N	
+P	32348	Technic, Liftarm, Modified Bent Thick 1 x 7 (4 - 4)	2	86	N	N	0	N	
+P	32291	Technic, Axle and Pin Connector Perpendicular Double	8	86	N	N	0	N	
+P	3031	Plate 4 x 4	2	86	N	N	0	N	
+P	3795	Plate 2 x 6	1	86	N	N	0	N	
+P	3032	Plate 4 x 6	4	86	N	N	0	N	
+P	3034	Plate 2 x 8	10	86	N	N	0	N	
+P	60479	Plate 1 x 12	11	86	N	N	0	N	
+P	30504	Wedge, Plate 8 x 8 Cut Corner	4	86	N	N	0	N	
+P	3666	Plate 1 x 6	4	6	N	N	0	N	
+P	3070b	Tile 1 x 1 with Groove	5	17	N	N	0	N	
+P	2412b	Tile, Modified 1 x 2 Grille with Bottom Groove / Lip	2	17	N	N	0	N	
+P	30374	Bar   4L (Lightsaber Blade / Wand)	1	17	N	N	0	N	
+P	4740	Dish 2 x 2 Inverted (Radar)	2	18	N	N	0	N	
+P	96874	Brick and Axle Separator	1	4	N	N	0	N	
+P	9500stk01	Sticker Sheet for Set 9500 - (10534/6005134)	1	0	N	N	0	N	
+M	sw0413	Darth Malgus	1	0	N	N	0	N	
+M	sw0414	Sith Trooper - Black Armor with Plain Legs	2	0	N	N	0	N	
+P	50747pb07	Windscreen 6 x 6 x 3 Canopy Half Sphere with Dual 2 Fingers with SW Sith Fighter Pattern	1	13	N	N	0	N	
+P	64567	Minifigure, Weapon Lightsaber Hilt Straight	1	67	N	N	0	N	
+P	3794a	Plate, Modified 1 x 2 with 1 Stud without Groove (Jumper)	2	86	N	N	2	N	

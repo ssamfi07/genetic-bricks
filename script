@@ -1,0 +1,15 @@
+#!/bin/bash
+
+echo "Clearing previous cmake files"
+
+rm -rfv build
+
+echo "Starting the building process..."
+
+# build the source files
+cmake -B build
+cd build
+make
+
+# running the executable
+./genetic ../csv_exports/wtf.csv

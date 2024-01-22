@@ -1,0 +1,17 @@
+step 1:
+READ the instance file -> contains:
+    - the items with:
+        - id
+        - color
+        - quantity
+based on this file's contents, we determine which are our variants of generating combinations.
+The item details are in itemcostvendor.csv. There items have multiple vendors with their own prices and shipping costs, currencies and status 
+    (whatevs stuff only ported to the end result).
+
+step 2:
+ARRANGE the items:
+    - filtered from the big itemcostvendor file
+    - smart data structure design -> object oriented could work better
+        - each item it's an object and all the details are in lists -> do json maybe??
+    - NO
+    - we need the duplicates for each item because only with the complete list of items we can correctly generate the populations
