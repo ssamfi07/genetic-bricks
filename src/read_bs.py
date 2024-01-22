@@ -40,6 +40,8 @@ def calculate_volume(dimensions):
     except (ValueError, IndexError):
         return 0
 
+
+
 # Main function to create the data structure
 def create_data_structure():
     # item fields
@@ -89,8 +91,47 @@ def create_data_structure():
     instance_parts['Volume'] = instance_parts['Dimensions'].apply(calculate_volume)
     instance_parts.drop(['Dimensions'], axis=1, inplace=True)
 
-    # # merge instance_parts with itemcostvendor on Item No and Color ID
+    # merge instance_parts with itemcostvendor on Item No and Color ID
     instance_parts_vendors = pd.merge(instance_parts, items, on=['Item No', 'Color ID'], how='left')
+
+    exchange_rates_dict = dict(zip(exchange_rates['currency'], exchange_rates['cambio']))
+    # vendors_dict = dict(zip(vendors['store'], vendors['country'], vendors['minvalor'], vendors['free'], vendors['racio']))
+
+    def calculate_price(row):
+        try:
+            unitprice = float(row['unitprice'])
+        except ValueError:
+            # If conversion to float fails, drop the row
+            return pd.NA
+        currency = row['currency']
+        exchange_rate = exchange_rates_dict.get(currency, 1)  # Default to 1 if currency not found
+        price = unitprice * exchange_rate
+        return round(price, 3)
+
+    instance_parts_vendors = pd.merge(instance_parts_vendors, vendors, on='store', how='left')
+
+    # Apply the function to create a new column 'Price'
+    # print(instance_parts_vendors['unitprice'])
+    instance_parts_vendors['Price'] = instance_parts_vendors.apply(calculate_price, axis=1)
+
+    instance_parts_vendors['country'] = instance_parts_vendors['country'].fillna('Unknown')  # Replace NaN with 'Unknown' or any default value
+    instance_parts_vendors['minvalor'] = instance_parts_vendors['minvalor'].fillna(0)  # Replace NaN with 0 or any default value
+    instance_parts_vendors['free'] = instance_parts_vendors['free'].fillna(False)  # Replace NaN with False or any default value
+    instance_parts_vendors['racio'] = instance_parts_vendors['racio'].fillna(0.0)  # Replace NaN with 0.0 or any default value
+
+    grouped_df = instance_parts_vendors.groupby(['Item No', 'Color ID', 'Qty', 'Weight', 'Volume']).agg({
+        'Description': list,
+        'Status': list,
+        'Stock': list,
+        'Price': list,
+        'store': list,
+        'country': list,
+        'minvalor': list,
+        'free': list,
+        'racio': list
+    }).reset_index()
+
+    grouped_df.drop(['Description'], axis=1, inplace=True)
 
     # # Create a new column 'Variants' containing lists of entries for each unique pair of 'Item No' and 'Color ID'
     # instance_parts_vendors['Variants'] = instance_parts_vendors.groupby(['Item No', 'Color ID']).apply(lambda group: group[
@@ -111,6 +152,6 @@ def create_data_structure():
     
     # #filter out stupid columns
     # instance_parts_vendors_exchange_colors.drop(['Number', 'Description', 'Color Name', 'RGB', 'Type', 'Parts', 'In Sets', 'Wanted', 'For Sale', 'Year From', 'Year To'], axis=1, inplace=True)
-    simple_export(instance_parts_vendors, 'wtf.csv')
+    simple_export(grouped_df, 'wtf.csv')
 
 create_data_structure()

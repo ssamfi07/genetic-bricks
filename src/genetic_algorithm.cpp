@@ -42,44 +42,6 @@ const double CLONING_RATE = 0.05;
 // Random number generator
 std::mt19937 rng(std::chrono::steady_clock::now().time_since_epoch().count());
 
-// Function to convert a CSV line to an Item
-Item convert_to_item(const string& line)
-{
-    Item item;
-    istringstream tokenStream(line);
-    string token;
-
-    // Read and assign values directly
-    if (getline(tokenStream, item.itemNo, ';') &&
-        getline(tokenStream, item.itemName, ';'))
-    {
-        try {
-            item.qty = stoi(token);
-            getline(tokenStream, item.colorID, ';');
-            getline(tokenStream, item.categoryID, ';');
-            getline(tokenStream, item.categoryName, ';');
-            item.weight = stoi(token);
-            getline(tokenStream, item.dimensions, ';');
-            getline(tokenStream, item.status, ';');
-            item.stock = stoi(token);
-            getline(tokenStream, item.store, ';');
-            getline(tokenStream, item.currency, ';');
-            item.unitPrice = stod(token);
-            item.cambio = stod(token);
-            getline(tokenStream, item.country, ';');
-            item.minValor = stod(token);
-            tokenStream >> std::boolalpha >> item.free;
-            tokenStream.ignore(); // Ignore the delimiter
-            item.racio = stod(token);
-        } catch (...) {
-            cerr << "Error: Invalid or missing numeric value." << endl;
-            exit(1);
-        }
-    }
-
-    return item;
-}
-
 vector<Item> initialize_problem(string filename)
 {
     ifstream input_file(filename);
@@ -97,7 +59,10 @@ vector<Item> initialize_problem(string filename)
 
     while (getline(input_file, line))
     {
-        items.push_back(convert_to_item(line));
+        // the first line has general info of the item
+
+        // the next lines represent all the possible variants an item can have, based on the stores
+        
     }
 
     input_file.close();
