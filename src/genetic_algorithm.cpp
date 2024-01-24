@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <sstream>
 #include <iterator>
+#include <unordered_map>
 
 using namespace std;
 
@@ -289,7 +290,12 @@ vector<Item> initialize_problem(string filename)
 
 // Function to randomly choose qty elements from each vector
 template <typename T>
-void randomlyChooseElements(std::vector<T>& vec, size_t qty) {
+void randomlyChooseElements(std::vector<T>& vec, size_t qty)
+{
+    // !! TODO
+    /* Some sellers require a minimum purchase value of parts per order (𝑚𝑖𝑛𝑗 ) 
+    and a minimum average value per SKU (𝑟𝑎𝑐𝑖𝑜𝑗 ).*/
+
     // Ensure that qty is not greater than the vector size
     qty = std::min(qty, vec.size());
 
@@ -324,22 +330,180 @@ void randomlyChooseElementsForItem(Item& item, size_t qty) {
     randomlyChooseElements(item.racio, qty);
 }
 
-// Function to calculate the fitness of a solution (to be minimized)
-double calculate_total_cost(const vector<Item>& items)
+// Helper function to parse the lower and upper bounds of a range
+std::pair<int, int> parseRange(const std::string& range)
+{
+    std::pair<int, int> result;
+    std::istringstream ss(range);
+
+    // Read the lower bound
+    ss >> result.first;
+
+    // Ignore non-digit characters until a digit is encountered
+    ss.ignore(std::numeric_limits<std::streamsize>::max(), '-');
+
+    // Read the upper bound
+    ss >> result.second;
+
+    return result;
+}
+
+double calculateShippingCost(const std::string& country, double weight,
+                                const std::vector<std::string>& ranges,
+                                const std::vector<std::string>& countries,
+                                const std::vector<std::vector<double>>& shippingCosts)
+{
+    // Find the index of the country in the 'countries' vector
+    auto countryIndex = std::find(countries.begin(), countries.end(), country);
+
+    
+
+    // Check if the country is found
+    if (countryIndex != countries.end())
+    {
+        // std::cout << "Index found" << std::endl;
+        // Calculate the total cost based on the weight range
+        auto colIndex = std::distance(countries.begin(), countryIndex);
+        for (size_t i = 0; i < ranges.size(); ++i)
+        {
+            // get the ranges interval
+            auto rangesPair = parseRange(ranges[i]);
+            // decide the weight range
+            if (weight <= rangesPair.second && weight >= rangesPair.first)
+            {
+                // std::cout << "Lower Bound: " << rangesPair.first << std::endl;
+                // std::cout << "Upper Bound: " << rangesPair.second << std::endl;
+                // std::cout << colIndex << " " << i << std::endl;
+                // std::cout << shippingCosts[i][colIndex] << std::endl;
+                // return the shipping cost
+                return shippingCosts[i][colIndex];
+            }
+        }
+
+        // If the weight exceeds the highest range, use the cost from the last column
+        return shippingCosts[ranges.size() - 1].back();
+    } 
+    else
+    {
+        for (size_t i = 0; i < ranges.size(); ++i)
+        {
+            // get the ranges interval
+            auto rangesPair = parseRange(ranges[i]);
+            // decide the weight range
+            if (weight <= rangesPair.second && weight >= rangesPair.first)
+            {
+                // std::cout << "Lower Bound: " << rangesPair.first << std::endl;
+                // std::cout << "Upper Bound: " << rangesPair.second << std::endl;
+                // std::cout << colIndex << " " << i << std::endl;
+                // std::cout << shippingCosts[i][colIndex] << std::endl;
+                // return the shipping cost for ALl Other
+                return shippingCosts[i].back();
+            }
+        }
+        // If the weight exceeds the highest range, use the cost from the last column
+        return shippingCosts[ranges.size() - 1].back();
+    }
+}
+
+void readShippingCosts(const std::string& filename,
+                        std::vector<std::string>& ranges,
+                        std::vector<std::string>& countries,
+                        std::vector<std::vector<double>>& shippingCosts)
+{
+    // Open the CSV file
+    std::ifstream file(filename);
+
+    // Check if the file is open
+    if (file.is_open())
+    {
+        std::string line;
+
+        // Read the header line
+        std::getline(file, line);
+
+        // Use a stringstream to parse the header line
+        std::istringstream headerStream(line);
+
+        // Skip the first column
+        std::string range;
+        std::getline(headerStream, range, ';');
+
+        // Read and store the countries
+        while (std::getline(headerStream, range, ';')) {
+            countries.push_back(range);
+        }
+
+        // Read the remaining lines
+        while (std::getline(file, line)) {
+            // Use a stringstream to parse each line
+            std::istringstream ss(line);
+
+            // Read the ranges
+            std::getline(ss, range, ';');
+            ranges.push_back(range);
+
+            // Read and store values for each country
+            std::vector<double> countryCosts;
+            double cost;
+            while (ss >> cost) {
+                countryCosts.push_back(cost);
+
+                // Skip the semicolon
+                if (ss.peek() == ';')
+                    ss.ignore();
+            }
+
+            // Store the country costs
+            shippingCosts.push_back(countryCosts);
+        }
+
+        // Close the file
+        file.close();
+    } else {
+        std::cerr << "Error: Unable to open the file." << std::endl;
+    }
+}
+
+// Function to calculate the fitness of an individual solution (to be minimized)
+double calculate_total_cost(const vector<Item>& items,
+                            const std::vector<std::string>& ranges,
+                            const std::vector<std::string>& countries,
+                            const std::vector<std::vector<double>>& shippingCosts)
 {
     double total_cost = 0.0;
 
+    std::unordered_map<std::string, double> country_weights; // Track total weights per country
+
     for (const Item& item : items)
     {
+        // simply add the prices of the variants to the total cost of a solution
+        total_cost += std::accumulate(item.price.begin(), item.price.end(), 0);
+        // add the country weights to the dictionary of country weights
+        for (int i = 0; i < item.qty; ++i)
+        {
+            // take the country name of one variant
+            std::string country = item.country[i];
+            // add it's weight to the dictionary entry
+            country_weights[country] += item.weight;
+        }
         // magic happens here
 
         // the constraints, prices, shipping, etc etc
     }
 
+    // add the shipping prices for each country
+    // Print total weights per country (optional)
+    for (const auto& entry : country_weights)
+    {
+        // std::cout << "Total weight for " << entry.first << ": " << entry.second << " grams\n";
+        auto cost = calculateShippingCost(entry.first, entry.second, ranges, countries, shippingCosts);
+        // std::cout << "Shipping cost to " << entry.first << " for weight " << entry.second << ": " << cost << std::endl;
+        total_cost += cost;
+    }
     return total_cost;
 }
 
-// Function to perform crossover
+// Function to perform crossover between 2 individual solutions
 vector<Item> crossover(const vector<Item>& parent1, const vector<Item>& parent2, double crossover_rate)
 {
     vector<Item> child(parent1.size());
@@ -368,7 +532,7 @@ vector<Item> crossover(const vector<Item>& parent1, const vector<Item>& parent2,
     return child;
 }
 
-// Function to perform mutation
+// Function to perform mutation on the child
 void mutation(vector<Item>& solution)
 {
     for (Item& item : solution)
@@ -388,7 +552,7 @@ void mutation(vector<Item>& solution)
     }
 }
 
-// Function to generate a random initial population
+// Function to generate a random initial population of individual (possible) solutions
 vector<vector<Item>> generate_population(int population_size, vector<Item> items)
 {
     // initialize the population
@@ -423,8 +587,8 @@ vector<Item> genetic_algorithm(const vector<Item>& items)
         vector<pair<double, int>> fitnesses;
         for (int i = 0; i < POPULATION_SIZE; i++)
         {
-            double fitness = calculate_total_cost(population[i]);
-            fitnesses.push_back({fitness, i});
+            // double fitness = calculate_total_cost(population[i]);
+            // fitnesses.push_back({fitness, i});
         }
 
         // Compute the total fitness of the population
@@ -520,15 +684,52 @@ int main(int argc, char* argv[])
         cerr << "Usage: " << argv[0] << " <input_file>" << endl;
         return 1;
     }
+    std::vector<std::string> ranges;
+    std::vector<std::string> countries;
+    std::vector<std::vector<double>> shippingCosts;
 
     std::vector<Item> items = initialize_problem(argv[1]);
 
 
-    auto start = std::chrono::system_clock::now();
-    auto genetic_solution = genetic_algorithm(items);
-    auto end = std::chrono::system_clock::now();
-    auto time = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
-    std::cout << "Time taken: " << time << " microseconds" << std::endl;
+    readShippingCosts("../input/ShippingRates.csv", ranges, countries, shippingCosts);
+
+    // Print the vectors for verification
+    // std::cout << "Ranges: ";
+    // for (const auto& range : ranges) {
+    //     std::cout << range << " ";
+    // }
+    // std::cout << std::endl;
+
+    // std::cout << "Countries: ";
+    // for (const auto& country : countries) {
+    //     std::cout << country << " ";
+    // }
+    // std::cout << std::endl;
+
+    // std::cout << "Shipping Costs:" << std::endl;
+    // for (const auto& row : shippingCosts) {
+    //     for (const auto& cost : row) {
+    //         std::cout << cost << " ";
+    //     }
+    //     std::cout << std::endl;
+    // }
+
+    // create random individuals
+    vector<Item> individual = items;
+    // Apply the function to each item
+    for (auto& item : individual) {
+        randomlyChooseElementsForItem(item, item.qty);
+        // displayItem(item);
+    }
+
+    std::cout << calculate_total_cost(individual, ranges, countries, shippingCosts) << std::endl;
+
+
+    // auto start = std::chrono::system_clock::now();
+    // auto genetic_solution = genetic_algorithm(items);
+    // auto end = std::chrono::system_clock::now();
+    // auto time = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+    // std::cout << "Time taken: " << time << " microseconds" << std::endl;
     
 
     return 0;
