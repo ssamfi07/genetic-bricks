@@ -108,6 +108,24 @@ def create_data_structure():
         price = unitprice * exchange_rate
         return round(price, 3)
 
+    # Define a function to encode 'Used' as 0 and 'New' as 1
+    def encode_status(status_list):
+        return [0 if status == 'Used' else 1 for status in status_list]
+
+    # Function to process stock values
+    def encode_stock(stock_list):
+        return [process_stock_value(value) for value in stock_list]
+
+    # Function to remove quotes and convert to integer
+    def process_stock_value(value):
+        try:
+            # Attempt to convert to integer without quotes
+            return int(value)
+        except ValueError:
+            # Handle the case where conversion to integer fails
+            print(f"Warning: Unable to convert '{value}' to integer.")
+            return None  # or any other appropriate handling
+
     instance_parts_vendors = pd.merge(instance_parts_vendors, vendors, on='store', how='left')
 
     # Apply the function to create a new column 'Price'
@@ -115,43 +133,29 @@ def create_data_structure():
     instance_parts_vendors['Price'] = instance_parts_vendors.apply(calculate_price, axis=1)
 
     instance_parts_vendors['country'] = instance_parts_vendors['country'].fillna('Unknown')  # Replace NaN with 'Unknown' or any default value
-    instance_parts_vendors['minvalor'] = instance_parts_vendors['minvalor'].fillna(0)  # Replace NaN with 0 or any default value
-    instance_parts_vendors['free'] = instance_parts_vendors['free'].fillna(False)  # Replace NaN with False or any default value
+    instance_parts_vendors['minvalor'] = instance_parts_vendors['minvalor'].fillna(0.0)  # Replace NaN with 0 or any default value
+    instance_parts_vendors['free'] = instance_parts_vendors['free'].fillna(0.0)  # Replace NaN with 0 or any default value
     instance_parts_vendors['racio'] = instance_parts_vendors['racio'].fillna(0.0)  # Replace NaN with 0.0 or any default value
 
     grouped_df = instance_parts_vendors.groupby(['Item No', 'Color ID', 'Qty', 'Weight', 'Volume']).agg({
-        'Description': list,
+        # 'Description': list,
         'Status': list,
         'Stock': list,
         'Price': list,
-        'store': list,
+        # 'store': list,
         'country': list,
         'minvalor': list,
         'free': list,
         'racio': list
     }).reset_index()
 
-    grouped_df.drop(['Description'], axis=1, inplace=True)
+    # Apply the encoding function to the 'Status' column
+    grouped_df['Status'] = grouped_df['Status'].apply(encode_status)
 
-    # # Create a new column 'Variants' containing lists of entries for each unique pair of 'Item No' and 'Color ID'
-    # instance_parts_vendors['Variants'] = instance_parts_vendors.groupby(['Item No', 'Color ID']).apply(lambda group: group[
-    #     ['Status', 'Stock', 'store', 'currency', 'unitprice']].values.tolist()).reset_index(drop=True)
-    # print(instance_parts_vendors)
+    # Apply the encoding function to the 'Stock' column
+    grouped_df['Stock'] = grouped_df['Stock'].apply(encode_stock)
 
-    # # merge instance_parts_vendors with exchange rates on currency
-    # instance_parts_vendors_exchange = pd.merge(instance_parts_vendors, exchange_rates, on='currency')
-    # # simple_export(instance_parts_vendors_exchange, 'wtf.csv')
-
-    # # merge instance_parts_vendors with colors on color id
-    # instance_parts_vendors_exchange.drop(['Color ID_y'], axis=1, inplace=True)
-    # instance_parts_vendors_exchange.rename(columns={'Color ID_x': 'Color ID'}, inplace=True)
-    # instance_parts_vendors_exchange_colors = pd.merge(instance_parts_vendors_exchange, colors, on='Color ID')
-
-    # # merge instance_parts_vendors_exchange_colors with vendors on store
-    # instance_parts_vendors_exchange_colors = pd.merge(instance_parts_vendors_exchange_colors, vendors, on='store')
-    
-    # #filter out stupid columns
-    # instance_parts_vendors_exchange_colors.drop(['Number', 'Description', 'Color Name', 'RGB', 'Type', 'Parts', 'In Sets', 'Wanted', 'For Sale', 'Year From', 'Year To'], axis=1, inplace=True)
+    # export final dataframe
     simple_export(grouped_df, 'wtf.csv')
 
 create_data_structure()
