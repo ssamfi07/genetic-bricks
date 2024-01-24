@@ -22,7 +22,7 @@ include_directories(
 file(GLOB MY_FILES "*.csv")
 
 file(COPY 
-        ${CMAKE_CURRENT_SOURCE_DIR}/csv_exports/wtf.csv
+        ${CMAKE_CURRENT_SOURCE_DIR}/csv_exports/database.csv
         ${CMAKE_CURRENT_SOURCE_DIR}/input/ShippingRates.csv
      DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 

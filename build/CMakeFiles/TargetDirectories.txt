@@ -1,0 +1,3 @@
+/home/sstef/Documents/Master/Nico's adventure/genetic-bricks/build/CMakeFiles/genetic.dir
+/home/sstef/Documents/Master/Nico's adventure/genetic-bricks/build/CMakeFiles/edit_cache.dir
+/home/sstef/Documents/Master/Nico's adventure/genetic-bricks/build/CMakeFiles/rebuild_cache.dir

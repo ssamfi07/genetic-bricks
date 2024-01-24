@@ -7,14 +7,20 @@
 #include <sstream>
 #include <iterator>
 #include <unordered_map>
+#include <unordered_set>
 
-using namespace std;
+// Constants for genetic algorithm
+const int POPULATION_SIZE = 500;
+const int NUM_GENERATIONS = 600;
+const double CROSSOVER_RATE = 0.75;
+const double MUTATION_RATE = 0.01;
+const double CLONING_RATE = 0.05;
 
 // Data structure for an item
 struct Item
 {
-    string itemNo;
-    string colorID;
+    std::string itemNo;
+    std::string colorID;
     int qty;
     double weight;
     double volume;
@@ -22,18 +28,11 @@ struct Item
     std::vector<int> stock;
     std::vector<double> price;
     // std::vector<string> store;
-    std::vector<string> country;
+    std::vector<std::string> country;
     std::vector<double> minValor;
     std::vector<double> free;
     std::vector<double> racio;
 };
-
-// Constants for genetic algorithm
-const int POPULATION_SIZE = 100;
-const int NUM_GENERATIONS = 100;
-const double CROSSOVER_RATE = 0.75;
-const double MUTATION_RATE = 0.01;
-const double CLONING_RATE = 0.05;
 
 // Random number generator
 std::mt19937 rng(std::chrono::steady_clock::now().time_since_epoch().count());
@@ -103,7 +102,7 @@ void displayItem(const Item& item)
     std::cout << "]" << std::endl;
 }
 
-vector<Item> initialize_problem(string filename)
+std::vector<Item> initialize_problem(std::string filename)
 {
     std::vector<Item> items;
     std::ifstream file(filename);
@@ -143,7 +142,7 @@ vector<Item> initialize_problem(string filename)
         // Read and assign values to the status vector
         getline(ss, token, '[');
         getline(ss, token, ']');
-        istringstream status_ss(token);
+        std::istringstream status_ss(token);
 
         // Loop to read integers from status_ss and add them to item.status
         while (status_ss >> token)
@@ -169,7 +168,7 @@ vector<Item> initialize_problem(string filename)
         // read the Stock vector
         getline(ss, token, '[');
         getline(ss, token, ']');
-        istringstream stock_ss(token);
+        std::istringstream stock_ss(token);
 
         // Loop to read integers from stock_ss and add them to item.stock
         while (stock_ss >> token)
@@ -195,7 +194,7 @@ vector<Item> initialize_problem(string filename)
         // read the Prices vector
         getline(ss, token, '[');
         getline(ss, token, ']');
-        istringstream price_ss(token);
+        std::istringstream price_ss(token);
 
         // Loop to read integers from price_ss and add them to item.prices
        while (price_ss >> token)
@@ -221,7 +220,7 @@ vector<Item> initialize_problem(string filename)
         // Read and assign values to the countries vector
         getline(ss, token, '[');
         getline(ss, token, ']');
-        istringstream countries_ss(token);
+        std::istringstream countries_ss(token);
 
         while (getline(countries_ss, token, ','))
         {
@@ -236,7 +235,7 @@ vector<Item> initialize_problem(string filename)
         // read the minValor vector
         getline(ss, token, '[');
         getline(ss, token, ']');
-        istringstream minval_ss(token);
+        std::istringstream minval_ss(token);
 
         // Loop to read integers from minval_ss and add them to item.minvalor
         while (minval_ss >> token)
@@ -251,7 +250,7 @@ vector<Item> initialize_problem(string filename)
         // read the free vector
         getline(ss, token, '[');
         getline(ss, token, ']');
-        istringstream free_ss(token);
+        std::istringstream free_ss(token);
 
         // Loop to read integers from free_ss and add them to item.free
         while (free_ss >> token)
@@ -266,7 +265,7 @@ vector<Item> initialize_problem(string filename)
         // read the racio vector
         getline(ss, token, '[');
         getline(ss, token, ']');
-        istringstream racio_ss(token);
+        std::istringstream racio_ss(token);
 
         // Loop to read integers from racio_ss and add them to item.racio
         while (racio_ss >> token)
@@ -287,47 +286,63 @@ vector<Item> initialize_problem(string filename)
     return items;
 }
 
-
-// Function to randomly choose qty elements from each vector
-template <typename T>
-void randomlyChooseElements(std::vector<T>& vec, size_t qty)
+void randomlyChooseElements(Item& item)
 {
-    // !! TODO
-    /* Some sellers require a minimum purchase value of parts per order (𝑚𝑖𝑛𝑗 ) 
-    and a minimum average value per SKU (𝑟𝑎𝑐𝑖𝑜𝑗 ).*/
-
-    // Ensure that qty is not greater than the vector size
-    qty = std::min(qty, vec.size());
-
-    // Shuffle indices
-    std::vector<size_t> indices(vec.size());
+    // Create indices vector and shuffle it
+    std::vector<int> indices(item.stock.size());
     std::iota(indices.begin(), indices.end(), 0);
-    std::random_shuffle(indices.begin(), indices.end());
+    std::shuffle(indices.begin(), indices.end(), std::mt19937(std::random_device()()));
 
-    // Sort the first qty indices to get random indices
-    std::sort(indices.begin(), indices.begin() + qty);
+    std::vector<int> selected;
 
-    // Create a temporary vector to store the selected elements
-    std::vector<T> selectedElements(qty);
+    std::vector<bool> newStatus;
+    std::vector<int> newStock;
+    std::vector<double> newPrice;
+    std::vector<std::string> newCountry;
+    std::vector<double> newMinValor;
+    std::vector<double> newFree;
+    std::vector<double> newRacio;
 
-    // Copy the selected elements from the original vector
-    for (size_t i = 0; i < qty; ++i) {
-        selectedElements[i] = vec[indices[i]];
+    // Iterate through shuffled indices
+    int localQuantity = item.qty;
+    for (int idx : indices)
+    {
+        // Update price at the shuffled index based on the minimum of stock and remaining quantity
+        int minStockQty = std::min(item.stock[idx], localQuantity);
+        item.price[idx] *= minStockQty;
+
+        // Update remaining quantity
+        localQuantity -= minStockQty;
+
+        selected.push_back(idx);
+
+        // Break the loop if remaining quantity becomes 0
+        if (localQuantity == 0) {
+            break;
+        }
     }
 
-    // Assign the selected elements back to the original vector
-    vec = selectedElements;
-}
+    for (int i = 0; i < selected.size(); i++)
+    {
+        newStatus.push_back(item.status[selected[i]]);
+        newStock.push_back(item.stock[selected[i]]);
+        newPrice.push_back(item.price[selected[i]]);
+        newCountry.push_back(item.country[selected[i]]);
+        newMinValor.push_back(item.minValor[selected[i]]);
+        newFree.push_back(item.free[selected[i]]);
+        newRacio.push_back(item.racio[selected[i]]);
+    }
 
-// Function to randomly choose elements for each item
-void randomlyChooseElementsForItem(Item& item, size_t qty) {
-    randomlyChooseElements(item.status, qty);
-    randomlyChooseElements(item.stock, qty);
-    randomlyChooseElements(item.price, qty);
-    randomlyChooseElements(item.country, qty);
-    randomlyChooseElements(item.minValor, qty);
-    randomlyChooseElements(item.free, qty);
-    randomlyChooseElements(item.racio, qty);
+    item.status = newStatus;
+    item.stock = newStock;
+    item.price = newPrice;
+    item.country = newCountry;
+    item.minValor = newMinValor;
+    item.free = newFree;
+    item.racio = newRacio;
+
+    // displayItem(item);
+    // exit(1);
 }
 
 // Helper function to parse the lower and upper bounds of a range
@@ -355,9 +370,6 @@ double calculateShippingCost(const std::string& country, double weight,
 {
     // Find the index of the country in the 'countries' vector
     auto countryIndex = std::find(countries.begin(), countries.end(), country);
-
-    
-
     // Check if the country is found
     if (countryIndex != countries.end())
     {
@@ -465,7 +477,7 @@ void readShippingCosts(const std::string& filename,
 }
 
 // Function to calculate the fitness of an individual solution (to be minimized)
-double calculate_total_cost(const vector<Item>& items,
+double calculate_total_cost(const std::vector<Item>& items,
                             const std::vector<std::string>& ranges,
                             const std::vector<std::string>& countries,
                             const std::vector<std::vector<double>>& shippingCosts)
@@ -478,17 +490,23 @@ double calculate_total_cost(const vector<Item>& items,
     {
         // simply add the prices of the variants to the total cost of a solution
         total_cost += std::accumulate(item.price.begin(), item.price.end(), 0);
+        // std::cout << "Total cost: " << total_cost << std::endl;
+        int localQuantity = item.qty;
         // add the country weights to the dictionary of country weights
-        for (int i = 0; i < item.qty; ++i)
+        for (int i = 0; i < item.stock.size() && localQuantity; ++i)
         {
             // take the country name of one variant
             std::string country = item.country[i];
-            // add it's weight to the dictionary entry
-            country_weights[country] += item.weight;
-        }
-        // magic happens here
 
-        // the constraints, prices, shipping, etc etc
+            // calculate the weight based on the minimum between stock and quantity
+            double weight = item.weight * std::min(item.stock[i], localQuantity);
+
+            // update quantity remaining
+            localQuantity -= item.stock[i];
+
+            // add it's weight to the dictionary entry
+            country_weights[country] += weight;
+        }
     }
 
     // add the shipping prices for each country
@@ -500,13 +518,16 @@ double calculate_total_cost(const vector<Item>& items,
         // std::cout << "Shipping cost to " << entry.first << " for weight " << entry.second << ": " << cost << std::endl;
         total_cost += cost;
     }
+    // std::cout << "Total cost: " << total_cost << std::endl;
     return total_cost;
 }
 
 // Function to perform crossover between 2 individual solutions
-vector<Item> crossover(const vector<Item>& parent1, const vector<Item>& parent2, double crossover_rate)
+std::vector<Item> crossover(const std::vector<Item>& parent1,
+                                const std::vector<Item>& parent2,
+                                double crossover_rate)
 {
-    vector<Item> child(parent1.size());
+    std::vector<Item> child(parent1.size());
 
     // generate a random double between 0 and 1
     std::uniform_real_distribution<double> dist(0.0, 1.0);
@@ -533,38 +554,39 @@ vector<Item> crossover(const vector<Item>& parent1, const vector<Item>& parent2,
 }
 
 // Function to perform mutation on the child
-void mutation(vector<Item>& solution)
-{
-    for (Item& item : solution)
-    {
-        // generate a random double between 0 and 1
-        std::uniform_real_distribution<double> dist(0.0, 1.0);
+// void mutation(std::vector<Item>& solution)
+// {
+//     for (Item& item : solution)
+//     {
+//         // generate a random double between 0 and 1
+//         std::uniform_real_distribution<double> dist(0.0, 1.0);
 
-        double mutation_chance = dist(rng);
-        if (mutation_chance < MUTATION_RATE)
-        {
-            // Mutate the quantity (Qty) based on the available stock
-            for (auto& item : solution) {
-                randomlyChooseElementsForItem(item, item.qty);
-                // displayItem(item);
-            }
-        }
-    }
-}
+//         double mutation_chance = dist(rng);
+//         if (mutation_chance < MUTATION_RATE)
+//         {
+//             // Mutate the quantity (Qty) based on the available stock
+//             for (auto& item : solution) {
+//                 randomlyChooseElements(item);
+//                 // displayItem(item);
+//             }
+//         }
+//     }
+// }
 
 // Function to generate a random initial population of individual (possible) solutions
-vector<vector<Item>> generate_population(int population_size, vector<Item> items)
+std::vector<std::vector<Item>> generate_population(int population_size, std::vector<Item> items)
 {
     // initialize the population
-    vector<vector<Item>> population(population_size);
+    std::vector<std::vector<Item>> population(population_size);
 
     for (int i = 0; i < population_size; i++)
     {
         // create random individuals
-        vector<Item> individual = items;
+        std::vector<Item> individual = items;
         // Apply the function to each item
-        for (auto& item : individual) {
-            randomlyChooseElementsForItem(item, item.qty);
+        for (auto& item : individual)
+        {
+            randomlyChooseElements(item);
             // displayItem(item);
         }
 
@@ -575,20 +597,24 @@ vector<vector<Item>> generate_population(int population_size, vector<Item> items
 
 
 // Function to run the genetic algorithm
-vector<Item> genetic_algorithm(const vector<Item>& items)
+std::vector<Item> genetic_algorithm(const std::vector<Item>& items,
+                                    const std::vector<std::string>& ranges,
+                                    const std::vector<std::string>& countries,
+                                    const std::vector<std::vector<double>>& shippingCosts)
 {
-    auto start = std::chrono::system_clock::now();
-    // ofstream output_file("genetic.txt", std::ios::out | std::ios::trunc);
+    // auto start = std::chrono::system_clock::now();
+    std::ofstream output_file("genetic.txt", std::ios::out | std::ios::trunc);
 
-    vector<vector<Item>> population = generate_population(POPULATION_SIZE, items);
+    std::vector<std::vector<Item>> population = generate_population(POPULATION_SIZE, items);
     for (int generation = 0; generation < NUM_GENERATIONS; generation++)
     {
         // Add fitnesses for each individual in the population
-        vector<pair<double, int>> fitnesses;
+        std::vector<std::pair<double, int>> fitnesses;
         for (int i = 0; i < POPULATION_SIZE; i++)
         {
-            // double fitness = calculate_total_cost(population[i]);
-            // fitnesses.push_back({fitness, i});
+            double fitness = calculate_total_cost(population[i], ranges, countries, shippingCosts);
+            // std::cout << "Fitness of individual " << i << "from generation " << generation << " is : " << fitness << std::endl;
+            fitnesses.push_back({fitness, i});
         }
 
         // Compute the total fitness of the population
@@ -598,15 +624,17 @@ vector<Item> genetic_algorithm(const vector<Item>& items)
             total_fitness += fitnesses[i].first;
         }
 
+        // std::cout << "Total fitness: " << total_fitness << std::endl;
+
         // Compute the probabilities of selection for each individual
-        vector<double> selection_probabilities(POPULATION_SIZE);
+        std::vector<double> selection_probabilities(POPULATION_SIZE);
         for (int i = 0; i < POPULATION_SIZE; i++)
         {
             selection_probabilities[i] = fitnesses[i].first / total_fitness;
         }
 
         // Create a new population
-        vector<vector<Item>> new_population(POPULATION_SIZE);
+        std::vector<std::vector<Item>> new_population(POPULATION_SIZE);
 
         // Generate random children by crossover
         for (int i = 0; i < POPULATION_SIZE; i++)
@@ -650,30 +678,32 @@ vector<Item> genetic_algorithm(const vector<Item>& items)
                 }
 
                 // Perform crossover and mutation to create the child
-                vector<Item> child = crossover(population[parent1_index], population[parent2_index], CROSSOVER_RATE);
+                std::vector<Item> child = crossover(population[parent1_index], population[parent2_index], CROSSOVER_RATE);
                 // mutation(child); -- for later
                 new_population[i] = child;
             }
         }
 
-        sort(fitnesses.begin(), fitnesses.end(), greater<pair<double, int>>());
+        std::sort(fitnesses.begin(), fitnesses.end(), std::less<std::pair<double, int>>());
 
         // Elitism: Always keep the best 5 solutions for each new generation
-        for (int i = POPULATION_SIZE-1; i >= 0; i--)
-        {
-            new_population[i] = population[fitnesses[i].second];
-        }
+        // the smaller the fitness the better
+        // for (int i = POPULATION_SIZE - 1; i >= 0; i--)
+        // {
+        //     new_population[i] = population[fitnesses[i].second];
+        // }
 
-        auto end = std::chrono::system_clock::now();
-        auto time = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+        // auto end = std::chrono::system_clock::now();
+        // auto time = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
 
         // Print best individual fitnesses and time (converted to seconds)
-        // output_file << fitnesses[0].first << " " << (double)time / 1000000 << endl;
+        // it should be the first element
+        output_file << fitnesses[0].first << std::endl;
 
         population = new_population;
     }
 
-    // output_file.close();
+    output_file.close();
     return population[0];
 }
 
@@ -681,7 +711,7 @@ int main(int argc, char* argv[])
 {
     if (argc != 2)
     {
-        cerr << "Usage: " << argv[0] << " <input_file>" << endl;
+        std::cerr << "Usage: " << argv[0] << " <input_file>" << std::endl;
         return 1;
     }
     std::vector<std::string> ranges;
@@ -693,44 +723,18 @@ int main(int argc, char* argv[])
 
     readShippingCosts("../input/ShippingRates.csv", ranges, countries, shippingCosts);
 
-    // Print the vectors for verification
-    // std::cout << "Ranges: ";
-    // for (const auto& range : ranges) {
-    //     std::cout << range << " ";
-    // }
-    // std::cout << std::endl;
 
-    // std::cout << "Countries: ";
-    // for (const auto& country : countries) {
-    //     std::cout << country << " ";
-    // }
-    // std::cout << std::endl;
-
-    // std::cout << "Shipping Costs:" << std::endl;
-    // for (const auto& row : shippingCosts) {
-    //     for (const auto& cost : row) {
-    //         std::cout << cost << " ";
-    //     }
-    //     std::cout << std::endl;
-    // }
-
-    // create random individuals
-    vector<Item> individual = items;
-    // Apply the function to each item
-    for (auto& item : individual) {
-        randomlyChooseElementsForItem(item, item.qty);
-        // displayItem(item);
-    }
-
-    std::cout << calculate_total_cost(individual, ranges, countries, shippingCosts) << std::endl;
-
-
-    // auto start = std::chrono::system_clock::now();
-    // auto genetic_solution = genetic_algorithm(items);
-    // auto end = std::chrono::system_clock::now();
-    // auto time = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
-    // std::cout << "Time taken: " << time << " microseconds" << std::endl;
+    auto start = std::chrono::system_clock::now();
+    auto genetic_solution = genetic_algorithm(items, ranges, countries, shippingCosts);
+    auto end = std::chrono::system_clock::now();
+    auto time = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+    std::cout << "Time taken: " << time << " microseconds" << std::endl;
     
+
+    // for (auto item: genetic_solution)
+    // {
+    //     displayItem(item);
+    // }
 
     return 0;
 }

@@ -156,6 +156,6 @@ def create_data_structure():
     grouped_df['Stock'] = grouped_df['Stock'].apply(encode_stock)
 
     # export final dataframe
-    simple_export(grouped_df, 'wtf.csv')
+    simple_export(grouped_df, 'database.csv')
 
 create_data_structure()

@@ -12,4 +12,4 @@ cd build
 make
 
 # running the executable
-./genetic ../csv_exports/wtf.csv
+./genetic ../csv_exports/database.csv
