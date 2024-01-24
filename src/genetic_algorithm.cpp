@@ -28,8 +28,8 @@ struct Item
 };
 
 // Constants for genetic algorithm
-const int POPULATION_SIZE = 500;
-const int NUM_GENERATIONS = 250;
+const int POPULATION_SIZE = 100;
+const int NUM_GENERATIONS = 100;
 const double CROSSOVER_RATE = 0.75;
 const double MUTATION_RATE = 0.01;
 const double CLONING_RATE = 0.05;
@@ -327,14 +327,16 @@ void randomlyChooseElementsForItem(Item& item, size_t qty) {
 // Function to calculate the fitness of a solution (to be minimized)
 double calculate_total_cost(const vector<Item>& items)
 {
-    // double total_cost = 0.0;
+    double total_cost = 0.0;
 
-    // for (const Item& item : items)
-    // {
-    //     total_cost += item.qty * item.price;
-    // }
+    for (const Item& item : items)
+    {
+        // magic happens here
 
-    // return total_cost;
+        // the constraints, prices, shipping, etc etc
+    }
+
+    return total_cost;
 }
 
 // Function to perform crossover
@@ -369,41 +371,42 @@ vector<Item> crossover(const vector<Item>& parent1, const vector<Item>& parent2,
 // Function to perform mutation
 void mutation(vector<Item>& solution)
 {
-    // for (Item& item : solution)
-    // {
-    //     // generate a random double between 0 and 1
-    //     std::uniform_real_distribution<double> dist(0.0, 1.0);
+    for (Item& item : solution)
+    {
+        // generate a random double between 0 and 1
+        std::uniform_real_distribution<double> dist(0.0, 1.0);
 
-    //     double mutation_chance = dist(rng);
-    //     if (mutation_chance < MUTATION_RATE)
-    //     {
-    //         // Mutate the quantity (Qty) based on the available stock
-    //         item.qty = std::min(item.qty + 1, item.stock);
-    //     }
-    // }
+        double mutation_chance = dist(rng);
+        if (mutation_chance < MUTATION_RATE)
+        {
+            // Mutate the quantity (Qty) based on the available stock
+            for (auto& item : solution) {
+                randomlyChooseElementsForItem(item, item.qty);
+                // displayItem(item);
+            }
+        }
+    }
 }
 
 // Function to generate a random initial population
-vector<vector<Item>> generate_population(int population_size, const vector<Item>& items)
+vector<vector<Item>> generate_population(int population_size, vector<Item> items)
 {
-    // int num_items = items.size();
-    // vector<vector<Item>> population(population_size);
+    // initialize the population
+    vector<vector<Item>> population(population_size);
 
-    // for (int i = 0; i < population_size; i++)
-    // {
-    //     vector<Item> individual(num_items);
+    for (int i = 0; i < population_size; i++)
+    {
+        // create random individuals
+        vector<Item> individual = items;
+        // Apply the function to each item
+        for (auto& item : individual) {
+            randomlyChooseElementsForItem(item, item.qty);
+            // displayItem(item);
+        }
 
-    //     for (int j = 0; j < num_items; j++)
-    //     {
-    //         // Randomly set the quantity for each item in the individual
-    //         std::uniform_int_distribution<int> qty_dist(0, items[j].stock);
-    //         individual[j].qty = qty_dist(rng);
-    //     }
-
-    //     population[i] = individual;
-    // }
-
-    // return population;
+        population[i] = individual;
+    }
+    return population;
 }
 
 
@@ -411,7 +414,7 @@ vector<vector<Item>> generate_population(int population_size, const vector<Item>
 vector<Item> genetic_algorithm(const vector<Item>& items)
 {
     auto start = std::chrono::system_clock::now();
-    ofstream output_file("genetic.txt", std::ios::out | std::ios::trunc);
+    // ofstream output_file("genetic.txt", std::ios::out | std::ios::trunc);
 
     vector<vector<Item>> population = generate_population(POPULATION_SIZE, items);
     for (int generation = 0; generation < NUM_GENERATIONS; generation++)
@@ -484,7 +487,7 @@ vector<Item> genetic_algorithm(const vector<Item>& items)
 
                 // Perform crossover and mutation to create the child
                 vector<Item> child = crossover(population[parent1_index], population[parent2_index], CROSSOVER_RATE);
-                mutation(child);
+                // mutation(child); -- for later
                 new_population[i] = child;
             }
         }
@@ -492,7 +495,7 @@ vector<Item> genetic_algorithm(const vector<Item>& items)
         sort(fitnesses.begin(), fitnesses.end(), greater<pair<double, int>>());
 
         // Elitism: Always keep the best 5 solutions for each new generation
-        for (int i = 0; i < 5; ++i)
+        for (int i = POPULATION_SIZE-1; i >= 0; i--)
         {
             new_population[i] = population[fitnesses[i].second];
         }
@@ -501,12 +504,12 @@ vector<Item> genetic_algorithm(const vector<Item>& items)
         auto time = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
 
         // Print best individual fitnesses and time (converted to seconds)
-        output_file << fitnesses[0].first << " " << (double)time / 1000000 << endl;
+        // output_file << fitnesses[0].first << " " << (double)time / 1000000 << endl;
 
         population = new_population;
     }
 
-    output_file.close();
+    // output_file.close();
     return population[0];
 }
 
@@ -518,16 +521,15 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    vector<Item> items = initialize_problem(argv[1]);
+    std::vector<Item> items = initialize_problem(argv[1]);
 
-    // Apply the function to each item
-    for (auto& item : items) {
-        randomlyChooseElementsForItem(item, item.qty);
-        displayItem(item);
-    }
 
-    // Run genetic algorithm and print solution
-    // auto genetic_solution = genetic_algorithm(items);
+    auto start = std::chrono::system_clock::now();
+    auto genetic_solution = genetic_algorithm(items);
+    auto end = std::chrono::system_clock::now();
+    auto time = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+    std::cout << "Time taken: " << time << " microseconds" << std::endl;
+    
 
     return 0;
 }
