@@ -1,4 +1,5 @@
 import pandas as pd  # Assuming you'll use pandas for data manipulation
+import numpy as np
 import os
 
 # Function to read data from a file and extract relevant fields
@@ -39,6 +40,16 @@ def calculate_volume(dimensions):
         return volume
     except (ValueError, IndexError):
         return 0
+    
+def count_multiple_store_values(df):
+    # Count the number of unique store values for each group
+    unique_stores = df.groupby(['Item No', 'Color ID', 'Qty', 'Weight', 'Volume'])['store'].nunique()
+
+    # Create a new column indicating whether there are multiple unique store values
+    multiple_stores = unique_stores > 1
+
+    # Return the DataFrame with the new column
+    return df.assign(multiple_stores=multiple_stores)
 
 
 
@@ -142,20 +153,30 @@ def create_data_structure():
         'Status': list,
         'Stock': list,
         'Price': list,
-        # 'store': list,
         'country': list,
         'minvalor': list,
         'free': list,
-        'racio': list
+        'racio': list,
+        'store': list,
     }).reset_index()
 
-    # Apply the encoding function to the 'Status' column
-    grouped_df['Status'] = grouped_df['Status'].apply(encode_status)
+    # # Apply the encoding function to the 'Status' column
+    # grouped_df['Status'] = grouped_df['Status'].apply(encode_status)
 
-    # Apply the encoding function to the 'Stock' column
-    grouped_df['Stock'] = grouped_df['Stock'].apply(encode_stock)
+    # # Apply the encoding function to the 'Stock' column
+    # grouped_df['Stock'] = grouped_df['Stock'].apply(encode_stock)
 
-    # export final dataframe
-    simple_export(grouped_df, 'database.csv')
+
+    # mask = grouped_df['Stock'].apply(lambda x: pd.isna(x[0]) if len(x) > 0 else False)
+    # masked_df = grouped_df[~mask]
+
+
+
+
+# # Apply the function to the grouped_df
+#     df = count_multiple_store_values(grouped_df.copy())
+#     print(df)
+#     # export final dataframe
+#     # simple_export(masked_df, 'database.csv')
 
 create_data_structure()
