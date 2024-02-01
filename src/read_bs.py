@@ -40,16 +40,7 @@ def calculate_volume(dimensions):
         return volume
     except (ValueError, IndexError):
         return 0
-    
-def count_multiple_store_values(df):
-    # Count the number of unique store values for each group
-    unique_stores = df.groupby(['Item No', 'Color ID', 'Qty', 'Weight', 'Volume'])['store'].nunique()
 
-    # Create a new column indicating whether there are multiple unique store values
-    multiple_stores = unique_stores > 1
-
-    # Return the DataFrame with the new column
-    return df.assign(multiple_stores=multiple_stores)
 
 
 
@@ -72,7 +63,13 @@ def create_data_structure():
     instance = read_data('../input/Instances/S-9500-1.txt', instance_fields)
     # read data for the items
     items = read_data('../input/itemcostvendor.csv', item_fields)
-    # read the data for exchange rates
+
+    # Create a Boolean mask to identify rows with 'Status' starting with '[%'
+    items_mask = items['Status'].str.startswith('[%')
+
+    # Drop rows where 'Status' starts with '[%'
+    items = items.loc[~items_mask]    # read the data for exchange rates
+
     exchange_rates = read_data('../input/euroexchangerate.csv', exchange_rate_fields, delimiter=';')
     # read the data for parts
     parts = read_data('../input/Parts.txt', parts_fields)
@@ -160,15 +157,15 @@ def create_data_structure():
         'store': list,
     }).reset_index()
 
-    # # Apply the encoding function to the 'Status' column
-    # grouped_df['Status'] = grouped_df['Status'].apply(encode_status)
+    # Apply the encoding function to the 'Status' column
+    grouped_df['Status'] = grouped_df['Status'].apply(encode_status)
 
-    # # Apply the encoding function to the 'Stock' column
-    # grouped_df['Stock'] = grouped_df['Stock'].apply(encode_stock)
+    # Apply the encoding function to the 'Stock' column
+    grouped_df['Stock'] = grouped_df['Stock'].apply(encode_stock)
 
 
-    # mask = grouped_df['Stock'].apply(lambda x: pd.isna(x[0]) if len(x) > 0 else False)
-    # masked_df = grouped_df[~mask]
+    mask = grouped_df['Stock'].apply(lambda x: pd.isna(x[0]) if len(x) > 0 else False)
+    masked_df = grouped_df[~mask]
 
 
 
@@ -177,6 +174,6 @@ def create_data_structure():
 #     df = count_multiple_store_values(grouped_df.copy())
 #     print(df)
 #     # export final dataframe
-#     # simple_export(masked_df, 'database.csv')
+    simple_export(masked_df, 'database.csv')
 
 create_data_structure()
