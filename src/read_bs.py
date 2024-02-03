@@ -33,8 +33,10 @@ def simple_export(df, fileName):
 # Function to calculate volume
 def calculate_volume(dimensions):
     try:
+        dimensions = str(dimensions)
         # Split the dimensions and convert to integers
-        parts = [int(part) if part.isdigit() else 0 for part in dimensions.split(' x ')]
+        parts = dimensions.split(' x ')
+        parts = [int(element) for element in parts]
         # Calculate volume
         volume = parts[0] * parts[1] * parts[2]
         return volume
@@ -60,9 +62,9 @@ def create_data_structure():
     vendors_fields = ['store', 'country', 'minvalor', 'free', 'racio']
 
     # read data for the instance
-    instance = read_data('../input/Instances/S-9500-1.txt', instance_fields)
+    instance = read_data('../input/Instances/S-9500-1.txt', instance_fields).astype(str)
     # read data for the items
-    items = read_data('../input/itemcostvendor.csv', item_fields)
+    items = read_data('../input/itemcostvendor.csv', item_fields).astype(str)
 
     # Create a Boolean mask to identify rows with 'Status' starting with '[%'
     items_mask = items['Status'].str.startswith('[%')
@@ -84,25 +86,39 @@ def create_data_structure():
 
     # rename the Name from parts to Item Name for consistency
     exchange_rates.rename(columns={'sndmoeda': 'currency'}, inplace=True)
-    items.rename(columns={'unitcurrency': 'currency'}, inplace=True)
+    items.rename(columns={'unitcurrency': 'currency', }, inplace=True)
 
     # Calculate the 'price' field
     # item_cost_data['price'] = item_cost_data.apply(calculate_price, axis=1)
 
     # Determine 'sndvalor' field
     # item_cost_data['sndvalor'] = item_cost_data.apply(determine_sndvalor, axis=1)
-
+    instance_parts = pd.merge(instance, parts,  how='left', left_on=['Item_Name'], right_on = ['Item_Name'])
+    # print(instance_parts.columns)
+    
     # Merge the dataframes on the 'Item Name' field
-    instance_parts = pd.merge(instance, parts, on='Item_Name')
     instance_parts.drop(['Number', 'Category ID', 'Category Name'], axis=1, inplace=True)
     instance_parts.rename(columns={'Weight (in Grams)': 'Weight'}, inplace=True)
-    instance_parts['Volume'] = instance_parts['Dimensions'].apply(calculate_volume)
+    instance_parts['volume'] = instance_parts['Dimensions'].apply(calculate_volume)
     instance_parts.drop(['Dimensions'], axis=1, inplace=True)
 
     # merge instance_parts with itemcostvendor on Item No and Color ID
     instance_parts_vendors = pd.merge(instance_parts, items, on=['Item No', 'Color ID'], how='left')
-
     exchange_rates_dict = dict(zip(exchange_rates['currency'], exchange_rates['cambio']))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     # vendors_dict = dict(zip(vendors['store'], vendors['country'], vendors['minvalor'], vendors['free'], vendors['racio']))
 
     def calculate_price(row):
@@ -145,7 +161,7 @@ def create_data_structure():
     instance_parts_vendors['free'] = instance_parts_vendors['free'].fillna(0.0)  # Replace NaN with 0 or any default value
     instance_parts_vendors['racio'] = instance_parts_vendors['racio'].fillna(0.0)  # Replace NaN with 0.0 or any default value
 
-    grouped_df = instance_parts_vendors.groupby(['Item No', 'Color ID', 'Qty', 'Weight', 'Volume']).agg({
+    grouped_df = instance_parts_vendors.groupby(['Item No', 'Color ID', 'Qty', 'Weight', 'volume']).agg({
         # 'Description': list,
         'Status': list,
         'Stock': list,

@@ -93,13 +93,19 @@ def ShippingRanges(shipping_ranges):
 def initialize_population():
     # Create the inner array of arrays
     sol = np.array([np.arange(length) for length in db['Qty']], dtype=object)
+    stores = np.array(lengths, dtype=object)
+    prices = np.zeros((len(db), max(db['Qty'])), dtype=float)
+
     # Repeat the inner array 500 times to create the outer array
     pop = np.array([sol.copy() for _ in range(POPULATION)], dtype=object)
+    sts = np.array([stores.copy() for _ in range(POPULATION)], dtype=object)
+    pcs = np.array([prices.copy() for _ in range(POPULATION)], dtype=object)
+
     # Print the shape of the outer array
     for i in range(POPULATION):
         # pop[i] = single_solution()
-        pop[i] , store_solution= second_creation()
-    return pop
+        pop[i] , sts[i], pcs[i]= second_creation()
+    return pop, sts, pcs
 
 # cost based only on the price
 def item_cost(item, offer, qty):
@@ -163,7 +169,9 @@ def CostStores(filtered_solution):
 def second_creation():
     solution = np.array([np.arange(length) for length in db.Qty], dtype=object)
     prices = np.zeros((len(db), max(db['Qty'])), dtype=float)
-    store_solution = []
+    length = len(db['Qty'])
+    store_solution = np.full((len(db), max(db['Qty'])), '',dtype='U100')
+    # print(store_solution)
     indexes = np.arange(len(db['Qty']))
     np.random.shuffle(indexes)
 
@@ -178,7 +186,7 @@ def second_creation():
 
         while current_qty > 0:
 
-            for st in store_solution:
+            for st in np.unique(store_solution.flatten()):
                 # we search for a store that we are already using but not for the same item
                 if st in db.loc[current_index,'store']:
                     if np.any(~np.isin(np.where(db.loc[current_index, 'store'] == st), solution[current_index])):
@@ -204,62 +212,61 @@ def second_creation():
                     # vendor_index = random.choice(np.arange(len(db.loc[current_index, 'store'])))
                     solution[current_index][store_n] = vendor_index
                     prices[current_index][store_n] = item_cost(current_index, vendor_index, min(current_qty, db.loc[current_index, 'Stock'][vendor_index]))
+                    # print(db.loc[current_index, 'store'][vendor_index])
+                    store_solution[current_index][store_n] = db.loc[current_index, 'store'][vendor_index]
+                    # print(store_solution[current_index][store_n])
                     store_n += 1
                     # print('vendor index = ' + str(vendor_index) + ', Lunghezza = ' + str(db.loc[current_index, 'Stock'][vendor_index]))
                     current_qty -= min(db.loc[current_index, 'Qty'], db.loc[current_index, 'Stock'][vendor_index])
                     # print(db.loc[current_index, 'store'])
-                    store_solution.append(db.loc[current_index, 'store'][vendor_index])
                     # print(str(vendor_index)+ ' -> ' + str(db.loc[current_index, 'store'][vendor_index]) )
                     break
     
     filtered_solution = np.array([[x for x in arr if x >= 0] for arr in solution], dtype=object)
     # filtered_prices = np.array([[x for x in arr if x > 0] for arr in prices], dtype=object)
     # print(filtered_prices)
-    return filtered_solution, np.array(store_solution), prices
+    return filtered_solution, store_solution[store_solution != ''], prices
+
+
+def FitnessOK(filtered_solution, stores_solution, prices):
+    sr = pd.read_csv(shipping_ranges,delimiter=';')
+    sr['LRange']= sr.Range.apply(lambda x: x.split(' - ')[0])
+    sr['URange']= sr.Range.apply(lambda x: x.split(' - ')[1])
+    sr = sr.drop(columns=['Range']).astype(float)
+
+
+    cost_solution = np.sum(prices)
+
+    for st in stores_solution:
+
+        weight = 0
+        country = ''
+        bill = 0
+        for item in range(len(filtered_solution)):
+            for batch in range(len(filtered_solution[item])):
+                    if db.loc[item, 'store'][filtered_solution[item][batch]] == st:
+                        weight += db.loc[item, 'Weight'] * min(db.loc[item, 'Weight'],db.loc[item, 'Stock'][filtered_solution[item][batch]])
+                        country = db.loc[item, 'country'][filtered_solution[item][batch]]
+                        bill += prices[item][batch]
+
+        #we control the shipping costs considering the eventuality that it is free
+        # print( db.loc[item, 'free'][filtered_solution[item][batch]])            
+        if db.loc[item, 'free'][filtered_solution[item][batch]] == 0 or db.loc[item, 'free'][filtered_solution[item][batch]] > bill:
+            # print( db.loc[item, 'free'][filtered_solution[item][batch]])
+            if country not in sr.columns:
+                cost_solution += sr.loc[(sr['LRange'] < weight) & (sr['URange']> weight), 'All Other'].values[0]
+            else:
+                cost_solution += sr.loc[(sr['LRange'] < weight) & (sr['URange']> weight), country].values[0]
+        # else: 
+        #     print('Avoinded shipping costs of ' + str(db.loc[item, 'free'][filtered_solution[item][batch]]) + ' Bill was ' + str(bill))
+    return cost_solution
+
+
 
 filtered_solution, stores_solution, prices = second_creation()
+print(FitnessOK(filtered_solution,stores_solution, prices))
 
 
-sr = pd.read_csv(shipping_ranges,delimiter=';')
-sr['LRange']= sr.Range.apply(lambda x: x.split(' - ')[0])
-sr['URange']= sr.Range.apply(lambda x: x.split(' - ')[1])
-sr = sr.drop(columns=['Range']).astype(float)
-
-
-cost_solution = np.sum(prices)
-
-for st in stores_solution:
-
-    weight = 0
-    country = ''
-    bill = 0
-    for item in range(len(filtered_solution)):
-        for batch in range(len(filtered_solution[item])):
-                if db.loc[item, 'store'][filtered_solution[item][batch]] == st:
-                    weight += db.loc[item, 'Weight'] * min(db.loc[item, 'Weight'],db.loc[item, 'Stock'][filtered_solution[item][batch]])
-                    country = db.loc[item, 'country'][filtered_solution[item][batch]]
-                    bill += prices[item][batch]
-
-    #we control the shipping costs considering the eventuality that it is free
-    # print( db.loc[item, 'free'][filtered_solution[item][batch]])            
-    if db.loc[item, 'free'][filtered_solution[item][batch]] == 0 or db.loc[item, 'free'][filtered_solution[item][batch]] > bill:
-        # print( db.loc[item, 'free'][filtered_solution[item][batch]])
-        if country not in sr.columns:
-            cost_solution += sr.loc[(sr['LRange'] < weight) & (sr['URange']> weight), 'All Other'].values[0]
-        else:
-            cost_solution += sr.loc[(sr['LRange'] < weight) & (sr['URange']> weight), country].values[0]
-    else: 
-        print('Avoinded shipping costs of ' + str(db.loc[item, 'free'][filtered_solution[item][batch]]) + ' Bill was ' + str(bill))
-
-print (cost_solution)
-
-    
-
-
-          
-
-
-    
 
 
 
