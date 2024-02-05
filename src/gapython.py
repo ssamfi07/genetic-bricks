@@ -8,8 +8,10 @@ import concurrent.futures
 
 POPULATION = 10
 ITERATIONS = 10
+CLONING_RATE = 0.05
 
 shipping_ranges = './input/ShippingRates.csv'
+vendors_csv = './input/vendors.csv'
 
 db = pd.read_csv('csv_exports/database.csv', delimiter=';', dtype=str)
 db['Qty'] = db['Qty'].astype(int)
@@ -93,7 +95,7 @@ def ShippingRanges(shipping_ranges):
 def initialize_population():
     # Create the inner array of arrays
     sol = np.array([np.arange(length) for length in db['Qty']], dtype=object)
-    stores = np.array(lengths, dtype=object)
+    stores = np.full((len(db), max(db['Qty'])), '',dtype='U100')
     prices = np.zeros((len(db), max(db['Qty'])), dtype=float)
 
     # Repeat the inner array 500 times to create the outer array
@@ -225,16 +227,18 @@ def second_creation():
     filtered_solution = np.array([[x for x in arr if x >= 0] for arr in solution], dtype=object)
     # filtered_prices = np.array([[x for x in arr if x > 0] for arr in prices], dtype=object)
     # print(filtered_prices)
-    return filtered_solution, store_solution[store_solution != ''], prices
+    return filtered_solution, store_solution, prices
 
 
 def FitnessOK(filtered_solution, stores_solution, prices):
+
+    stores_solution= np.unique(stores_solution[stores_solution != '']. flatten())
     sr = pd.read_csv(shipping_ranges,delimiter=';')
     sr['LRange']= sr.Range.apply(lambda x: x.split(' - ')[0])
     sr['URange']= sr.Range.apply(lambda x: x.split(' - ')[1])
     sr = sr.drop(columns=['Range']).astype(float)
 
-
+    cost_solution = 0
     cost_solution = np.sum(prices)
 
     for st in stores_solution:
@@ -242,6 +246,8 @@ def FitnessOK(filtered_solution, stores_solution, prices):
         weight = 0
         country = ''
         bill = 0
+
+
         for item in range(len(filtered_solution)):
             for batch in range(len(filtered_solution[item])):
                     if db.loc[item, 'store'][filtered_solution[item][batch]] == st:
@@ -249,7 +255,7 @@ def FitnessOK(filtered_solution, stores_solution, prices):
                         country = db.loc[item, 'country'][filtered_solution[item][batch]]
                         bill += prices[item][batch]
 
-        #we control the shipping costs considering the eventuality that it is free
+        # we control the shipping costs considering the eventuality that it is free
         # print( db.loc[item, 'free'][filtered_solution[item][batch]])            
         if db.loc[item, 'free'][filtered_solution[item][batch]] == 0 or db.loc[item, 'free'][filtered_solution[item][batch]] > bill:
             # print( db.loc[item, 'free'][filtered_solution[item][batch]])
@@ -261,10 +267,158 @@ def FitnessOK(filtered_solution, stores_solution, prices):
         #     print('Avoinded shipping costs of ' + str(db.loc[item, 'free'][filtered_solution[item][batch]]) + ' Bill was ' + str(bill))
     return cost_solution
 
+def GenerateChild(filtered_solution_1, store_solution_1, prices_1, filtered_solution_2, store_solution_2, prices_2):
+# filtered_solution_1, store_solution_1, prices_1 = second_creation()
+# filtered_solution_2, store_solution_2, prices_2 = second_creation()
+
+    child_solution = np.array([np.arange(length) for length in db.Qty], dtype=object)
+    child_stores = np.full((len(db), max(db['Qty'])), '',dtype='U100')
+    child_prices = np.zeros((len(db), max(db['Qty'])), dtype=float)
+    child_qtys = np.array(db['Qty'])
+
+    indexes = np.arange(len(db['Qty']))
+    np.random.shuffle(indexes)
+
+    for i in indexes:
+        child_solution[i] = np.full_like(child_solution[i], -1)
+        batch = 0
+        for inter in np.random.permutation(np.intersect1d(filtered_solution_1[i], filtered_solution_2[i])):
+            child_solution[i][batch] = inter
+            child_stores[i][batch] = db.loc[i, 'store'][inter]
+            child_prices[i][batch] += item_cost(i, inter, min(child_qtys[i], db.loc[i, 'Stock'][inter]))
+            child_qtys[i] -= min(child_qtys[i], db.loc[i, 'Stock'][inter])
+            batch += 1
+            if child_qtys[i] <= 0: break
+    np.random.shuffle(indexes)
+    np.unique(child_stores[child_stores != '']. flatten())
+    for i in indexes:
+        # np.unique(child_stores[child_stores != '']. flatten())
+        # print('Enter index ' + str(i))
+        while child_qtys[i] > 0:
+            
+            batch = np.count_nonzero(child_solution[i] > 0)
+            # print('The cs is '+ str(child_solution[i]) + ' so batch is ' + str(batch))
+            for j in range(len(filtered_solution_1[i])):
+                if store_solution_1[i][j] in np.unique(child_stores[child_stores != ''].flatten()):
+                    # print('match on '+ store_solution_1[i][j])
+                    child_solution[i][batch] = filtered_solution_1[i][j]
+                    child_prices[i][batch] = item_cost(i, filtered_solution_1[i][j], min(child_qtys[i], db.loc[i, 'Stock'][filtered_solution_1[i][j]]))
+                    child_stores[i][batch] = store_solution_1[i][j]
+                    child_qtys[i] -= min(child_qtys[i], db.loc[i, 'Stock'][filtered_solution_1[i][j]])
+                    batch += 1
+                    if child_qtys[i] <= 0: break 
+            if child_qtys[i] <= 0: break
+
+            for j in range(len(filtered_solution_2[i])):
+                if store_solution_2[i][j] in np.unique(child_stores[child_stores != ''].flatten()):
+                    # print('match on '+ store_solution_2[i][j])                  
+                    child_solution[i][batch] = filtered_solution_2[i][j]
+                    child_prices[i][batch] = item_cost(i, filtered_solution_2[i][j], min(child_qtys[i], db.loc[i, 'Stock'][filtered_solution_2[i][j]]))
+                    child_stores[i][batch] = store_solution_2[i][j]
+                    child_qtys[i] -= min(child_qtys[i], db.loc[i, 'Stock'][filtered_solution_2[i][j]])
+                    batch += 1
+                    if child_qtys[i] <= 0: break 
+            if child_qtys[i] <= 0: break
 
 
-filtered_solution, stores_solution, prices = second_creation()
-print(FitnessOK(filtered_solution,stores_solution, prices))
+            # print('we  go to the randoms, ' + str(child_qtys[i]))
+
+            selected = -1
+            if random.choice([1, 2]) == 1:
+                for j in np.argsort(db.loc[i, 'Price'][filtered_solution_1[i]]):
+                    if db.loc[i, 'Price'][filtered_solution_1[i][j]] not in child_solution[i]:
+                        # print('found')
+                        child_solution[i][batch] = filtered_solution_1[i][j]
+                        child_prices[i][batch] = item_cost(i, filtered_solution_1[i][j], min(child_qtys[i], db.loc[i, 'Stock'][filtered_solution_1[i][j]]))
+                        # min(child_qtys[i], db.loc[i, 'Stock'][filtered_solution_1[i][j]])
+                        child_stores[i][batch] = store_solution_1[i][j]
+                        child_qtys[i] -= min(child_qtys[i], db.loc[i, 'Stock'][filtered_solution_1[i][j]])
+                        batch += 1
+                        if child_qtys[i] <= 0: break
+                        
+            else:
+                for j in np.argsort(db.loc[i, 'Price'][filtered_solution_2[i]]):
+                    if db.loc[i, 'Price'][filtered_solution_2[i][j]] not in child_solution[i]:
+                        # print('found')
+                        child_solution[i][batch] = filtered_solution_2[i][j]
+                        child_prices[i][batch] = item_cost(i, filtered_solution_2[i][j], min(child_qtys[i], db.loc[i, 'Stock'][filtered_solution_2[i][j]]))
+                        # min(child_qtys[i], db.loc[i, 'Stock'][filtered_solution_1[i][j]])
+                        child_stores[i][batch] = store_solution_2[i][j]
+                        child_qtys[i] -= min(child_qtys[i], db.loc[i, 'Stock'][filtered_solution_2[i][j]])
+                        batch += 1
+                        if child_qtys[i] <= 0: break
+
+
+    filtered_child= np.array([[x for x in arr if x >= 0] for arr in child_solution], dtype=object)
+
+    # print('Parent 1 ->' +   str(np.sum(prices_1)))
+    # print(FitnessOK(filtered_solution_1,store_solution_1, prices_1))
+    # print(len(np.unique(store_solution_1[store_solution_1 != '']. flatten())))
+
+
+
+    # print('Parent 2 ->' +   str(np.sum(prices_2)))
+    # print(FitnessOK(filtered_solution_2,store_solution_2, prices_2))
+    # print(len(np.unique(store_solution_2[store_solution_2 != '']. flatten())))
+
+
+    # print
+    # print('Child solution ->' +   str(np.sum(child_prices)))
+    # print(FitnessOK(filtered_child, child_stores, child_prices))
+    # print(len(np.unique(child_stores[child_stores != '']. flatten())))
+    return filtered_child, child_stores, child_prices
+
+# pop, sts, pcs = initialize_population()
+# fitnesses = np.arange(POPULATION, dtype = float)
+# probabilities = np.arange(POPULATION, dtype = float)
+
+# for i in range(POPULATION):
+#     fitnesses[i] = FitnessOK(pop[i], sts[i], pcs[i])
+
+# # Calculate the reciprocal of fitness values
+# fitup = 1 / fitnesses
+
+# # Normalize the reciprocals to get probabilities
+# selection_probabilities = fitup / np.sum(fitup)
+
+# sol = np.array([np.arange(length) for length in db['Qty']], dtype=object)
+# stores = np.full((len(db), max(db['Qty'])), '',dtype='U100')
+# prices = np.zeros((len(db), max(db['Qty'])), dtype=float)
+
+# # Repeat the inner array 500 times to create the outer array
+# new_pop = np.array([sol.copy() for _ in range(POPULATION)], dtype=object)
+# new_sts = np.array([stores.copy() for _ in range(POPULATION)], dtype=object)
+# new_pcs = np.array([prices.copy() for _ in range(POPULATION)], dtype=object)
+
+# cloned = 0
+# sorted_solution = np.argsort(fitup)
+
+
+# for i in range(POPULATION):
+#     if random.random() < CLONING_RATE:
+#         print("Let's clone")
+#         new_pop[i], new_sts[i], new_pcs[i] = pop[sorted_solution[cloned]], sts[sorted_solution[cloned]], pcs[sorted_solution[cloned]]
+#     else:
+#         roulette_spin = random.random()
+#         cumulative_probability = 0.0
+#         parent_1 = np.random.choice(np.arange(POPULATION), p=selection_probabilities)
+#         parent_2 = parent_1
+#         while parent_2 == parent_1:
+#             parent_2 = np.random.choice(np.arange(POPULATION), p=selection_probabilities)
+        
+        # crossover operation
+
+
+filtered_solution, store_solution, prices = second_creation()
+stores = np.unique(store_solution[store_solution != ''])
+dbstore= pd.read_csv(vendors_csv,delimiter=';')[['store', 'country']]
+countries= np.array(['']* len(stores),dtype='U100')
+for i in range(len(stores)): 
+    countries[i]= dbstore.loc[dbstore['store']==stores[i], 'country'].values[0]
+
+print(countries)
+
+
 
 
 
