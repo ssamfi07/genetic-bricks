@@ -7,7 +7,7 @@ import concurrent.futures
 
 
 POPULATION = 100
-ITERATIONS = 500
+ITERATIONS = 250
 CLONING_RATE = 0.05
 
 shipping_ranges = './input/ShippingRates.csv'
@@ -417,38 +417,14 @@ for iter in range(ITERATIONS):
     fitnesses = new_fitnesses
     print('finishing ' + str(iter))
     
-# filtered_solution, store_solution, prices = second_creation()
+
 best = np.argmin(fitnesses)
 print(pop[best])
 print(fitnesses[best])
 print(np.unique(sts[best].flatten()))
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# filtered_solution, store_solution, prices = second_creation()
 # best_cost = FitnessOK(filtered_solution, store_solution, prices)
 # print('Best cost = '+ str(best_cost))
 
@@ -466,18 +442,17 @@ print(np.unique(sts[best].flatten()))
 #     ls_solution = np.array([np.arange(length) for length in db.Qty], dtype=object)
 #     ls_prices = np.zeros((len(db), max(db['Qty'])), dtype=float)
 #     ls_store = np.full((len(db), max(db['Qty'])), '',dtype='U100')
+
 #     print('Analyze '+ st)
 #     for item in range(len(filtered_solution)):
 #         qty = db.loc[item,'Qty']
 #         store_n = 0
+
 #         for i in range(len(ls_solution[item])):
 #             ls_solution[item][i] = -1
         
-#         if (st in db.loc[item, 'store']) and (st not in store_solution[item]):
+#         if (st in db.loc[item, 'store']):
             
-            
-
-
 #             for j in np.argsort(db.loc[item, 'Price'][db.loc[item, 'store'] == st]):
 #                 if (db.loc[item, 'store'][j]== st) and (j not in filtered_solution[item]) and (db.loc[item, 'store'][j] == st):
 #                     qty -= min(qty, db.loc[item, 'Stock'][db.loc[item, 'store'] == st][j])
@@ -499,10 +474,34 @@ print(np.unique(sts[best].flatten()))
 #                         store_n += 1
 #                         if qty <= 0: break
 
-#     print(ls_solution)
+#     print(ls_prices)
 #     print(FitnessOK(ls_solution, ls_store, ls_prices))
 
     # FitnessOK(filtered_solution, stores_solution, prices)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
